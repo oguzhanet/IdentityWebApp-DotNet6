@@ -4,6 +4,6 @@ namespace IdentityWebApp.Models
 {
     public class AppRole : IdentityRole
     {
-        public string RoleType { get; set; }
+
     }
 }
