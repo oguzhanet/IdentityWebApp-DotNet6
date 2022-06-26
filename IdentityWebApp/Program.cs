@@ -1,4 +1,6 @@
+using FluentValidation.AspNetCore;
 using IdentityWebApp.Models;
+using IdentityWebApp.Validations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,7 +15,9 @@ builder.Services.AddDbContext<AppIdentityDbContext>(options =>
 
 builder.Services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<AppIdentityDbContext>();
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddFluentValidation((fv => fv.RegisterValidatorsFromAssemblyContaining<UserViewModelValidator>()));
+
 builder.Services.AddMvc();
 
 var app = builder.Build();
