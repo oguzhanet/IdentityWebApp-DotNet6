@@ -9,7 +9,7 @@ namespace IdentityWebApp.Describers
             return new IdentityError()
             {
                 Code = "InvalidUserName",
-                Description = $"Bu kullanıcı adı '{userName}' geçersizdir."
+                Description = $"Bu kullanıcı adı '{userName}' geçersizdir." 
             };
         }
 
