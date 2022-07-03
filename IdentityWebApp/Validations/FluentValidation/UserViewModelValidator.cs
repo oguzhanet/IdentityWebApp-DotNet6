@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
 using IdentityWebApp.Models.ViewModels;
 
-namespace IdentityWebApp.Validations
+namespace IdentityWebApp.Validations.FluentValidation
 {
-    public class UserViewModelValidator:AbstractValidator<UserViewModel>
+    public class UserViewModelValidator : AbstractValidator<UserViewModel>
     {
         public UserViewModelValidator()
         {

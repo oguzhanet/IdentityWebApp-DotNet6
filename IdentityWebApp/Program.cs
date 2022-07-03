@@ -1,6 +1,7 @@
 using FluentValidation.AspNetCore;
 using IdentityWebApp.Models;
 using IdentityWebApp.Validations;
+using IdentityWebApp.Validations.FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,7 +14,12 @@ builder.Services.AddDbContext<AppIdentityDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
 });
 
-builder.Services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<AppIdentityDbContext>();
+builder.Services.AddIdentity<AppUser, AppRole>(ops =>
+{
+    ops.User.RequireUniqueEmail = true;
+    ops.User.AllowedUserNameCharacters = "abcçdefgðhýijklmnoöpqrsþtuüvwxyzABCÇDEFGÐHIÝJKLMNOÖPQRSÞTUÜVWXYZ0123456789-._@+";
+    ops.Password.RequiredLength = 8;
+}).AddPasswordValidator<CustomPasswordValidator>().AddEntityFrameworkStores<AppIdentityDbContext>();
 
 builder.Services.AddControllersWithViews()
     .AddFluentValidation((fv => fv.RegisterValidatorsFromAssemblyContaining<UserViewModelValidator>()));
