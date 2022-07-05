@@ -25,6 +25,21 @@ builder.Services.AddIdentity<AppUser, AppRole>(ops =>
 builder.Services.AddControllersWithViews()
     .AddFluentValidation((fv => fv.RegisterValidatorsFromAssemblyContaining<UserViewModelValidator>()));
 
+CookieBuilder cookieBuilder = new CookieBuilder();
+
+cookieBuilder.Name = "MyApp";
+cookieBuilder.HttpOnly = false;
+cookieBuilder.SameSite = SameSiteMode.Lax;
+cookieBuilder.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = new PathString("/Home/Login");
+    options.Cookie = cookieBuilder;
+    options.ExpireTimeSpan = TimeSpan.FromDays(30);
+    options.SlidingExpiration = true;
+});
+
 builder.Services.AddMvc();
 
 var app = builder.Build();

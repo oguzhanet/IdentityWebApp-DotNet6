@@ -10,11 +10,13 @@ namespace IdentityWebApp.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly UserManager<AppUser> _userManager;
+        private readonly SignInManager<AppUser> _signInManager;
 
-        public HomeController(ILogger<HomeController> logger, UserManager<AppUser> userManager)
+        public HomeController(ILogger<HomeController> logger, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
         {
             _logger = logger;
             _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         public IActionResult Index()
@@ -68,8 +70,45 @@ namespace IdentityWebApp.Controllers
             return View(userViewModel);
         }
 
-        public IActionResult LogIn()
+        public IActionResult LogIn(string ReturnUrl)
         {
+            TempData["ReturnUrl"] = ReturnUrl;
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> LogIn(LoginViewModel loginViewModel)
+        {
+            if (!ModelState.IsValid)
+                return View();
+            
+            AppUser user = await _userManager.FindByEmailAsync(loginViewModel.Email);
+
+            if (user != null)
+            {
+                await _signInManager.SignOutAsync();
+
+                Microsoft.AspNetCore.Identity.SignInResult signInResult = await _signInManager.PasswordSignInAsync(user, loginViewModel.Password, loginViewModel.RememberMe, false);
+
+                if (signInResult.Succeeded)
+                {
+                    if (TempData["ReturnUrl"] != null)
+                    {
+                        return Redirect(TempData["ReturnUrl"].ToString());
+                    }
+
+                    return RedirectToAction(nameof(Index), "Member");
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Email veya Şifresiniz yanlış.");
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "Kullanıcı bulunamadı.");
+            }
+
             return View();
         }
     }

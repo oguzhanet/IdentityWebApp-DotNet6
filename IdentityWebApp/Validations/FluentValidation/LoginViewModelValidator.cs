@@ -3,13 +3,10 @@ using IdentityWebApp.Models.ViewModels;
 
 namespace IdentityWebApp.Validations.FluentValidation
 {
-    public class UserViewModelValidator : AbstractValidator<UserViewModel>
+    public class LoginViewModelValidator:AbstractValidator<LoginViewModel>
     {
-        public UserViewModelValidator()
+        public LoginViewModelValidator()
         {
-            RuleFor(x => x.UserName)
-                .NotEmpty();
-
             RuleFor(x => x.Email)
                 .NotEmpty()
                 .EmailAddress();

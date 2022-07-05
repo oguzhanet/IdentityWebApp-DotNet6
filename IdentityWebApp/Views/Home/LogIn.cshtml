@@ -1,15 +1,72 @@
-﻿
+﻿@model LoginViewModel
 @{
     Layout = null;
 }
 
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width" />
-    <title>LogIn</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Sign Up Form by Colorlib</title>
+
+   <link rel="stylesheet" href="~/sign/fonts/material-icon/css/material-design-iconic-font.min.css">
+
+    <link rel="stylesheet" href="~/sign/css/style.css">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 </head>
 <body>
-</body>
+
+    <div class="main">
+
+        <section class="sign-in">
+            <div class="container">
+                <div class="signin-content">
+                    <div class="signin-image">
+                        <figure><img src="~/sign/images/signin-image.jpg" alt="sing up image"></figure>
+                        <a href="/Home/SignUp" class="signup-image-link">Create an account</a>
+                    </div>
+
+                    <div class="signin-form">
+                        <h2 class="form-title">Log In</h2>
+                        <form asp-controller="Home" asp-action="LogIn" method="post" class="register-form" id="login-form">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"> </div>
+                            <div class="form-group">
+                                <label asp-for="Email"><i class="zmdi zmdi-email"></i></label>
+                                <input asp-for="Email" placeholder="Email Adress"/>
+                                <span asp-validation-for="Email" class="text-danger"> </span>
+                            </div>
+                           <div class="form-group">
+                                <label asp-for="Password"><i class="zmdi zmdi-lock"></i></label>
+                                <input asp-for="Password" type="password" placeholder="Password"/>
+                                <span asp-validation-for="Password" class="text-danger"> </span>
+                            </div>
+                            <div class="form-group">
+                                <input asp-for="RememberMe" type="checkbox" class="agree-term" />
+                                <label asp-for="RememberMe" class="label-agree-term"><span><span></span></span>Remember me</label>
+                            </div>
+                            <div class="form-group form-button">
+                                <input type="submit" name="signin" id="signin" class="form-submit" value="Login"/>
+                            </div>
+                        </form>
+                        <div class="social-login">
+                            <span class="social-label">Or login with</span>
+                            <ul class="socials">
+                                <li><a href="#"><i class="display-flex-center zmdi zmdi-facebook"></i></a></li>
+                                <li><a href="#"><i class="display-flex-center zmdi zmdi-twitter"></i></a></li>
+                                <li><a href="#"><i class="display-flex-center zmdi zmdi-google"></i></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- JS -->
+    <script src="~/sign/vendor/jquery/jquery.min.js"></script>
+    <script src="~/sign/js/main.js"></script>
+</body><!-- This templates was made by Colorlib (https://colorlib.com) -->
 </html>
