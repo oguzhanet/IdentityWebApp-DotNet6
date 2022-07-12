@@ -86,12 +86,20 @@ namespace IdentityWebApp.Controllers
 
             if (user != null)
             {
+                if (await _userManager.IsLockedOutAsync(user))
+                {
+                    ModelState.AddModelError("", "Hasabınız bir süreliğine kitlenmiştir. Lütfen daha sonra tekrar deneyiniz.");
+                    return View();
+                }
+
                 await _signInManager.SignOutAsync();
 
                 Microsoft.AspNetCore.Identity.SignInResult signInResult = await _signInManager.PasswordSignInAsync(user, loginViewModel.Password, loginViewModel.RememberMe, false);
 
                 if (signInResult.Succeeded)
                 {
+                    await _userManager.ResetAccessFailedCountAsync(user);
+
                     if (TempData["ReturnUrl"] != null)
                     {
                         return Redirect(TempData["ReturnUrl"].ToString());
@@ -101,7 +109,20 @@ namespace IdentityWebApp.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Email veya Şifresiniz yanlış.");
+                    await _userManager.AccessFailedAsync(user);
+
+                    int failCount = await _userManager.GetAccessFailedCountAsync(user);
+
+                    if (failCount >= 3)
+                    {
+                        await _userManager.SetLockoutEndDateAsync(user, new DateTimeOffset(DateTime.Now.AddMinutes(20)));
+                        ModelState.AddModelError("", $"Hasabınız {failCount} başarısız girişten dolayı 20 dakika süreyle kitlenmiştir. Lütfen daha sonra tekrar deneyiniz.");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", $"{failCount} kez başarısız giriş yapıldı.");
+                        ModelState.AddModelError("", "Email veya Şifresiniz yanlış.");
+                    }
                 }
             }
             else
