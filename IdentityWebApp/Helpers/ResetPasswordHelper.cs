@@ -5,12 +5,12 @@ namespace IdentityWebApp.Helpers
 {
     public static class ResetPasswordHelper
     {
-        public static void ResetPasswordSendEmail(string link)
+        public static void ResetPasswordSendEmail(string link, string email)
         {
             using (MailMessage mail = new MailMessage())
             {
                 mail.From = new MailAddress("x");
-                mail.To.Add("x");
+                mail.To.Add(email);
                 mail.Subject = $"www.cengiz.com::Şifre yenileme";
                 mail.Body = "<h2>Şifrenizi yenilemek için lütfen aşagıdaki linke tıklayınız.</h2><hr/>";
                 mail.Body += $"<a href='{link}'>Şifre yenileme linki</a>";
