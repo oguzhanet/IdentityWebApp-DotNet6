@@ -1,4 +1,5 @@
-﻿using IdentityWebApp.Models;
+﻿using IdentityWebApp.Helpers;
+using IdentityWebApp.Models;
 using IdentityWebApp.Models.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -131,6 +132,38 @@ namespace IdentityWebApp.Controllers
             }
 
             return View();
+        }
+
+        public IActionResult ResetPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult ResetPassword(ResetPasswordViewModel resetPasswordViewModel)
+        {
+            AppUser user = _userManager.FindByEmailAsync(resetPasswordViewModel.Email).Result;
+
+            if (user != null)
+            {
+                string passwordResetToken = _userManager.GeneratePasswordResetTokenAsync(user).Result;
+
+                string passwordResetLink = Url.Action("ResetPasswordConfirm", "Home", new
+                {
+                    userId = user.Id,
+                    token = passwordResetToken
+                }, HttpContext.Request.Scheme);
+
+                ResetPasswordHelper.ResetPasswordSendEmail(passwordResetLink);
+
+                ViewBag.status = "successfull";
+            }
+            else
+            {
+                ModelState.AddModelError("", "Email adresi bulunamadı.");
+            }
+
+            return View(resetPasswordViewModel);
         }
     }
 }
