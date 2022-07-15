@@ -89,7 +89,7 @@ namespace IdentityWebApp.Controllers
             {
                 if (await _userManager.IsLockedOutAsync(user))
                 {
-                    ModelState.AddModelError("", "Hasabınız bir süreliğine kitlenmiştir. Lütfen daha sonra tekrar deneyiniz.");
+                    ModelState.AddModelError("", "Your account has been locked for a while. Please try again later.");
                     return View();
                 }
 
@@ -117,18 +117,18 @@ namespace IdentityWebApp.Controllers
                     if (failCount >= 3)
                     {
                         await _userManager.SetLockoutEndDateAsync(user, new DateTimeOffset(DateTime.Now.AddMinutes(20)));
-                        ModelState.AddModelError("", $"Hasabınız {failCount} başarısız girişten dolayı 20 dakika süreyle kitlenmiştir. Lütfen daha sonra tekrar deneyiniz.");
+                        ModelState.AddModelError("", $"Your account has been locked for 20 minutes due to {failCount} failed logins. Please try again later.");
                     }
                     else
                     {
-                        ModelState.AddModelError("", $"{failCount} kez başarısız giriş yapıldı.");
-                        ModelState.AddModelError("", "Email veya Şifresiniz yanlış.");
+                        ModelState.AddModelError("", $"Failed login {failCount} times.");
+                        ModelState.AddModelError("", "Your Email or Password is incorrect.");
                     }
                 }
             }
             else
             {
-                ModelState.AddModelError("", "Kullanıcı bulunamadı.");
+                ModelState.AddModelError("", "User not found.");
             }
 
             return View();
@@ -156,11 +156,54 @@ namespace IdentityWebApp.Controllers
 
                 ResetPasswordHelper.ResetPasswordSendEmail(passwordResetLink);
 
-                ViewBag.status = "successfull";
+                ViewBag.status = "success";
             }
             else
             {
-                ModelState.AddModelError("", "Email adresi bulunamadı.");
+                ModelState.AddModelError("", "Email not found.");
+            }
+
+            return View(resetPasswordViewModel);
+        }
+
+        public IActionResult ResetPasswordConfirm(string userId, string token)
+        {
+            TempData["userId"] = userId;
+            TempData["token"] = token;
+
+            return View();
+            //return RedirectToAction(nameof(LogIn));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPasswordConfirm([Bind("Password")]ResetPasswordViewModel resetPasswordViewModel)
+        {
+            string userId = TempData["userId"].ToString();
+            string token = TempData["token"].ToString();
+
+            AppUser user = await _userManager.FindByIdAsync(userId);
+
+            if (user != null)
+            {
+                IdentityResult? result = await _userManager.ResetPasswordAsync(user, token, resetPasswordViewModel.Password);
+
+                if (result.Succeeded)
+                {
+                    await _userManager.UpdateSecurityStampAsync(user);
+
+                    ViewBag.status = "success";
+                }
+                else
+                {
+                    foreach (var item in result.Errors)
+                    {
+                        ModelState.AddModelError("", item.Description);
+                    }
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "Could not reset password. Please try again later.");
             }
 
             return View(resetPasswordViewModel);
