@@ -140,7 +140,7 @@ namespace IdentityWebApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult ResetPassword(ResetPasswordViewModel resetPasswordViewModel)
+        public IActionResult ResetPassword([Bind("Email")] ResetPasswordViewModel resetPasswordViewModel)
         {
             AppUser user = _userManager.FindByEmailAsync(resetPasswordViewModel.Email).Result;
 
