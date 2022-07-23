@@ -22,6 +22,9 @@ namespace IdentityWebApp.Controllers
 
         public IActionResult Index()
         {
+            if (User.Identity.IsAuthenticated)
+                return RedirectToAction(nameof(Index), "Member");
+                
             return View();
         }
 
