@@ -9,19 +9,15 @@ using System.Diagnostics;
 
 namespace IdentityWebApp.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly UserManager<AppUser> _userManager;
-        private readonly SignInManager<AppUser> _signInManager;
         private readonly UserViewModelValidator _userViewModelValidator;
         private readonly LoginViewModelValidator _loginViewModelValidator;
 
-        public HomeController(ILogger<HomeController> logger, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, UserViewModelValidator userViewModelValidator, LoginViewModelValidator loginViewModelValidator)
+        public HomeController(ILogger<HomeController> logger, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, UserViewModelValidator userViewModelValidator, LoginViewModelValidator loginViewModelValidator): base(userManager,signInManager)
         {
             _logger = logger;
-            _userManager = userManager;
-            _signInManager = signInManager;
             _userViewModelValidator = userViewModelValidator;
             _loginViewModelValidator = loginViewModelValidator;
         }
@@ -73,10 +69,7 @@ namespace IdentityWebApp.Controllers
             }
             else
             {
-                foreach (var item in result.Errors)
-                {
-                    ModelState.AddModelError("", item.Description);
-                }
+                AddBaseModelError(result);
             }
 
             return View(userViewModel);
@@ -207,10 +200,7 @@ namespace IdentityWebApp.Controllers
                 }
                 else
                 {
-                    foreach (var item in result.Errors)
-                    {
-                        ModelState.AddModelError("", item.Description);
-                    }
+                    AddBaseModelError(result);
                 }
             }
             else

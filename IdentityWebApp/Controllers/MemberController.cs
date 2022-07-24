@@ -10,21 +10,18 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace IdentityWebApp.Controllers
 {
     [Authorize]
-    public class MemberController : Controller
+    public class MemberController : BaseController
     {
         private readonly ILogger<MemberController> _logger;
-        private readonly UserManager<AppUser> _userManager;
-        private readonly SignInManager<AppUser> _signInManager;
+       
 
-        public MemberController(ILogger<MemberController> logger, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
+        public MemberController(ILogger<MemberController> logger, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager):base(userManager, signInManager)  
         {
             _logger = logger;
-            _userManager = userManager;
-            _signInManager = signInManager;
         }
         public IActionResult Index()
         {
-            AppUser user = _userManager.FindByNameAsync(User.Identity.Name).Result;
+            AppUser user = CurrentUser;
             UserViewModel userViewModel = user.Adapt<UserViewModel>();
 
             return View(userViewModel);
@@ -32,7 +29,7 @@ namespace IdentityWebApp.Controllers
 
         public IActionResult UserEdit()
         {
-            AppUser user = _userManager.FindByNameAsync(User.Identity.Name).Result;
+            AppUser user = CurrentUser;
 
             UserViewModel userViewModel = user.Adapt<UserViewModel>();
 
@@ -93,10 +90,7 @@ namespace IdentityWebApp.Controllers
             }
             else
             {
-                foreach (var item in result.Errors)
-                {
-                    ModelState.AddModelError("", item.Description);
-                }
+                AddBaseModelError(result);
             }
             return View(model);
         }
@@ -112,7 +106,7 @@ namespace IdentityWebApp.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            AppUser user = _userManager.FindByNameAsync(User.Identity.Name).Result;
+            AppUser user = CurrentUser;
 
             if (user != null)
             {
@@ -135,10 +129,7 @@ namespace IdentityWebApp.Controllers
                     }
                     else
                     {
-                        foreach (var item in result.Errors)
-                        {
-                            ModelState.AddModelError("", item.Description);
-                        }
+                        AddBaseModelError(result);
                     }
                 }
                 else
