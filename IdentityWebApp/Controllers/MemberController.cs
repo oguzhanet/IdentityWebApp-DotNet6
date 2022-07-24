@@ -37,22 +37,47 @@ namespace IdentityWebApp.Controllers
             UserViewModel userViewModel = user.Adapt<UserViewModel>();
 
             ViewBag.gender = new SelectList(Enum.GetNames(typeof(GenderEnum)));
-            
+
             return View(userViewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> UserEdit(UserViewModel model)
+        public async Task<IActionResult> UserEdit(UserViewModel model, IFormFile userPicture)
         {
-            ModelState.Remove("Password");
-            if (!ModelState.IsValid)
-                return View(model);
+            //ModelState.Remove("Password");
+            //if (!ModelState.IsValid)
+            //    return View(model);
+            
+            ViewBag.gender = new SelectList(Enum.GetNames(typeof(GenderEnum)));
 
             AppUser user = await _userManager.FindByNameAsync(User.Identity.Name);
+
+            if (userPicture != null && userPicture.Length > 0)
+            {
+                string[] validImageFileTypes = { ".JPG", ".JPEG", ".PNG", ".TIF", ".TIFF", ".GIF", ".BMP", ".ICO" };
+                bool isValidFileExtension = validImageFileTypes.Any(t => t == Path.GetExtension(userPicture.FileName).ToUpper());
+                
+                if (isValidFileExtension)
+                {
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(userPicture.FileName);
+
+                    string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/UserPicture", fileName);
+
+                    using (var stream = new FileStream(path, FileMode.Create))
+                    {
+                        await userPicture.CopyToAsync(stream);
+
+                        user.Picture = "/UserPicture/" + fileName;
+                    }
+                }
+            }
 
             user.UserName = model.UserName;
             user.Email = model.Email;
             user.PhoneNumber = model.PhoneNumber;
+            user.City = model.City;
+            user.BirthDate = model.BirthDate;
+            user.Gender = (int)model.Gender;
 
             IdentityResult result = await _userManager.UpdateAsync(user);
 
