@@ -1,6 +1,8 @@
-﻿using IdentityWebApp.Helpers;
+﻿using FluentValidation.Results;
+using IdentityWebApp.Helpers;
 using IdentityWebApp.Models;
 using IdentityWebApp.Models.ViewModels;
+using IdentityWebApp.Validations.FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -12,12 +14,16 @@ namespace IdentityWebApp.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
+        private readonly UserViewModelValidator _userViewModelValidator;
+        private readonly LoginViewModelValidator _loginViewModelValidator;
 
-        public HomeController(ILogger<HomeController> logger, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
+        public HomeController(ILogger<HomeController> logger, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, UserViewModelValidator userViewModelValidator, LoginViewModelValidator loginViewModelValidator)
         {
             _logger = logger;
             _userManager = userManager;
             _signInManager = signInManager;
+            _userViewModelValidator = userViewModelValidator;
+            _loginViewModelValidator = loginViewModelValidator;
         }
 
         public IActionResult Index()
@@ -48,7 +54,9 @@ namespace IdentityWebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> SignUp(UserViewModel userViewModel)
         {
-            if (!ModelState.IsValid)
+            ValidationResult results = _userViewModelValidator.Validate(userViewModel);
+
+            if (!results.IsValid)
                 return View();
 
             AppUser appUser = new();
@@ -83,7 +91,8 @@ namespace IdentityWebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> LogIn(LoginViewModel loginViewModel)
         {
-            if (!ModelState.IsValid)
+            ValidationResult results = _loginViewModelValidator.Validate(loginViewModel);
+            if (!results.IsValid)
                 return View();
             
             AppUser user = await _userManager.FindByEmailAsync(loginViewModel.Email);

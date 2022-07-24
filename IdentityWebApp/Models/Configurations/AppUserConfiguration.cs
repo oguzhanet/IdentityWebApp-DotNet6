@@ -11,11 +11,10 @@ namespace IdentityWebApp.Models.Configurations
                 .HasMaxLength(30)
                 .IsRequired(false);
 
-            builder.Property(x => x.Gender)
-                .HasMaxLength(30)
+            builder.Property(x => x.BirthDate)
                 .IsRequired(false);
 
-            builder.Property(x => x.BirthDate)
+            builder.Property(x => x.Picture)
                 .IsRequired(false);
         }
     }

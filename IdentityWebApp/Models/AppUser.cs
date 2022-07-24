@@ -8,7 +8,7 @@ namespace IdentityWebApp.Models
 
         public string Picture { get; set; }
 
-        public string Gender { get; set; }
+        public int Gender { get; set; }
 
         public DateTime? BirthDate { get; set; }
     }

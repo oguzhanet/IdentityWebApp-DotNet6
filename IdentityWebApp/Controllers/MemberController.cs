@@ -1,9 +1,11 @@
-﻿using IdentityWebApp.Models;
+﻿using IdentityWebApp.Enums;
+using IdentityWebApp.Models;
 using IdentityWebApp.Models.ViewModels;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace IdentityWebApp.Controllers
 {
@@ -33,6 +35,8 @@ namespace IdentityWebApp.Controllers
             AppUser user = _userManager.FindByNameAsync(User.Identity.Name).Result;
 
             UserViewModel userViewModel = user.Adapt<UserViewModel>();
+
+            ViewBag.gender = new SelectList(Enum.GetNames(typeof(GenderEnum)));
             
             return View(userViewModel);
         }
