@@ -140,6 +140,11 @@ namespace IdentityWebApp.Controllers
             return View(model);
         }
 
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+
         public void Logout()
         {
             _signInManager.SignOutAsync();

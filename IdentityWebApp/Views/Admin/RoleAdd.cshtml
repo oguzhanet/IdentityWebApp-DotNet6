@@ -1,0 +1,28 @@
+﻿@model IdentityWebApp.Models.ViewModels.RoleViewModel
+
+@{
+    ViewData["Title"] = "RoleAdd";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+<h4>Role Add</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="RoleAdd">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label">Role</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Ok" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
