@@ -1,5 +1,6 @@
 ﻿using IdentityWebApp.Models;
 using IdentityWebApp.Models.ViewModels;
+using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -54,5 +55,55 @@ namespace IdentityWebApp.Controllers
         {
             return View(_userManager.Users.ToList());
         }
+
+        public IActionResult RoleUpdate(string id)
+        {
+            AppRole findRole = _roleManager.FindByIdAsync(id).Result;
+
+            RoleViewModel role = findRole.Adapt<RoleViewModel>();
+
+            return View(role);
+        }
+
+        [HttpPost]
+        public IActionResult RoleUpdate(RoleViewModel roleViewModel)
+        {
+            AppRole role = _roleManager.FindByIdAsync(roleViewModel.Id).Result;
+
+            if (role != null)
+            {
+                role.Name = roleViewModel.Name;
+
+                var result = _roleManager.UpdateAsync(role).Result;
+
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("GetAllRole");
+                }
+                else
+                {
+                    AddBaseModelError(result);
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "The update process failed.");
+            }
+
+            return View(roleViewModel);
+        }
+
+        public IActionResult RoleDelete(string id)
+        {
+            AppRole role = _roleManager.FindByIdAsync(id).Result;
+
+            if (role != null)
+            {
+               IdentityResult result = _roleManager.DeleteAsync(role).Result;
+            }
+
+            return RedirectToAction("GetAllRole");
+        }
+
     }
 }
