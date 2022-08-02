@@ -9,6 +9,8 @@
         <th>Id</th>
         <th>Name</th>
         <th>Email</th>
+        <th>Roles</th>
+        <th>Role Assign</th>
     </tr>
 
     @if (Model.Any())
@@ -19,6 +21,10 @@
             <td>@item.Id</td>
             <td>@item.UserName</td>
             <td>@item.Email</td>
+            <td user-roles="@item.Id"></td>
+            <td>
+                <a class="btn btn-success" asp-action="RoleAssign" asp-route-id="@item.Id">Role Assign</a>
+            </td>
         </tr>
         }
     }
