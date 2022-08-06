@@ -140,6 +140,18 @@ namespace IdentityWebApp.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Editor,Admin")]
+        public IActionResult EditorPage()
+        {
+            return View();
+        }
+
+        [Authorize(Roles = "Manager,Admin")]
+        public IActionResult ManagerPage()
+        {
+            return View();
+        }
+
         public IActionResult AccessDenied()
         {
             return View();

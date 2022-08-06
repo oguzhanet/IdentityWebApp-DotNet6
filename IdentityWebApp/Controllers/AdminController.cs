@@ -8,6 +8,7 @@ using System.Collections.Generic;
 
 namespace IdentityWebApp.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class AdminController : BaseController
     {
 
