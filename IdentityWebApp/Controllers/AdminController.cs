@@ -22,6 +22,11 @@ namespace IdentityWebApp.Controllers
             return View();
         }
 
+        public IActionResult Claims()
+        {
+            return View(User.Claims.ToList());
+        }
+
         public IActionResult GetAllRole()
         {
             return View(_roleManager.Roles.ToList());

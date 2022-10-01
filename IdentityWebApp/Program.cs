@@ -3,6 +3,7 @@ using IdentityWebApp.Describers;
 using IdentityWebApp.Models;
 using IdentityWebApp.Validations;
 using IdentityWebApp.Validations.FluentValidation;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +14,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppIdentityDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
+});
+
+builder.Services.AddAuthorization(ops =>
+{
+    ops.AddPolicy("IstanbulPolicy", policy =>
+    {
+        policy.RequireClaim("city", "Ýstanbul");
+    });
 });
 
 builder.Services.AddIdentity<AppUser, AppRole>(ops =>
@@ -41,6 +50,8 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.SlidingExpiration = true;
     options.AccessDeniedPath = new PathString("/Member/AccessDenied");
 });
+
+builder.Services.AddScoped<IClaimsTransformation, IdentityWebApp.ClaimProviders.ClaimProvider>();
 
 builder.Services.AddMvc();
 

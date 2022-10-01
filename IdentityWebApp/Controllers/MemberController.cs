@@ -161,5 +161,11 @@ namespace IdentityWebApp.Controllers
         {
             _signInManager.SignOutAsync();
         }
+
+        [Authorize(Policy = "IstanbulPolicy")]
+        public IActionResult IstanbulPage()
+        {
+            return View();
+        }
     }
 }
