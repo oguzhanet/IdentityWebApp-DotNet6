@@ -24,6 +24,18 @@ namespace IdentityWebApp.ClaimProviders
 
                 if (user != null)
                 {
+                    if (user.BirthDate != null)
+                    {
+                        var today = DateTime.Today;
+                        var age = today.Year - user.BirthDate?.Year;
+
+                        if (age > 18)
+                        {
+                            Claim violanceClaim = new Claim("violance", "true", ClaimValueTypes.String, "Internal");
+                            identity.AddClaim(violanceClaim);
+                        }
+                    }
+
                     if (user.City != null)
                     {
                         if (!principal.HasClaim(x=>x.Type == "city"))

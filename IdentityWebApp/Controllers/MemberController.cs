@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Security.Claims;
 
 namespace IdentityWebApp.Controllers
 {
@@ -164,6 +165,29 @@ namespace IdentityWebApp.Controllers
 
         [Authorize(Policy = "IstanbulPolicy")]
         public IActionResult IstanbulPage()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> ExchangeRedirect()
+        {
+            bool result = User.HasClaim(x => x.Type == "ExpireDateExchange");
+
+            if (!result)
+            {
+                Claim expireDateExchange = new Claim("ExpireDateExchange", DateTime.Now.AddDays(30).Date.ToShortDateString(), 
+                    ClaimValueTypes.String, "Internal");
+
+                await _userManager.AddClaimAsync(CurrentUser, expireDateExchange);
+                await _signInManager.SignOutAsync();
+                await _signInManager.SignInAsync(CurrentUser, isPersistent: true);
+            }
+
+            return RedirectToAction("Exchange");
+        }
+
+        [Authorize(Policy = "ExchangePolicy")]
+        public IActionResult Exchange()
         {
             return View();
         }

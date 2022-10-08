@@ -1,9 +1,11 @@
 using FluentValidation.AspNetCore;
 using IdentityWebApp.Describers;
 using IdentityWebApp.Models;
+using IdentityWebApp.Requirements;
 using IdentityWebApp.Validations;
 using IdentityWebApp.Validations.FluentValidation;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,11 +18,23 @@ builder.Services.AddDbContext<AppIdentityDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
 });
 
+builder.Services.AddTransient<IAuthorizationHandler, ExpireDateExchangeHandler>();
+
 builder.Services.AddAuthorization(ops =>
 {
     ops.AddPolicy("IstanbulPolicy", policy =>
     {
         policy.RequireClaim("city", "Ýstanbul");
+    });
+
+    ops.AddPolicy("ViolencePolicy", policy =>
+    {
+        policy.RequireClaim("violance"); 
+    });
+
+    ops.AddPolicy("ExchangePolicy", policy =>
+    {
+        policy.AddRequirements(new ExpireDateExchangeRequirement());
     });
 });
 
