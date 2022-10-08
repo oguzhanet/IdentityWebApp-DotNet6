@@ -15,7 +15,7 @@ namespace IdentityWebApp.Controllers
         private readonly UserViewModelValidator _userViewModelValidator;
         private readonly LoginViewModelValidator _loginViewModelValidator;
 
-        public HomeController(ILogger<HomeController> logger, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, UserViewModelValidator userViewModelValidator, LoginViewModelValidator loginViewModelValidator): base(userManager,signInManager)
+        public HomeController(ILogger<HomeController> logger, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, UserViewModelValidator userViewModelValidator, LoginViewModelValidator loginViewModelValidator) : base(userManager, signInManager)
         {
             _logger = logger;
             _userViewModelValidator = userViewModelValidator;
@@ -26,7 +26,7 @@ namespace IdentityWebApp.Controllers
         {
             if (User.Identity.IsAuthenticated)
                 return RedirectToAction(nameof(Index), "Member");
-                
+
             return View();
         }
 
@@ -65,6 +65,16 @@ namespace IdentityWebApp.Controllers
 
             if (result.Succeeded)
             {
+                string confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
+
+                string link = Url.Action("ConfirmEmail", "Home", new
+                {
+                    userId = appUser.Id,
+                    token = confirmationToken
+                }, protocol: HttpContext.Request.Scheme);
+
+                EmailConfirmation.SendEmail(link, appUser.Email);
+
                 return RedirectToAction(nameof(LogIn));
             }
             else
@@ -87,7 +97,7 @@ namespace IdentityWebApp.Controllers
             ValidationResult results = _loginViewModelValidator.Validate(loginViewModel);
             if (!results.IsValid)
                 return View();
-            
+
             AppUser user = await _userManager.FindByEmailAsync(loginViewModel.Email);
 
             if (user != null)
@@ -95,7 +105,13 @@ namespace IdentityWebApp.Controllers
                 if (await _userManager.IsLockedOutAsync(user))
                 {
                     ModelState.AddModelError("", "Your account has been locked for a while. Please try again later.");
-                    return View();
+                    return View(loginViewModel);
+                }
+
+                if (!_userManager.IsEmailConfirmedAsync(user).Result)
+                {
+                    ModelState.AddModelError("", "Email is not verified.");
+                    return View(loginViewModel);
                 }
 
                 await _signInManager.SignOutAsync();
@@ -180,8 +196,24 @@ namespace IdentityWebApp.Controllers
             //return RedirectToAction(nameof(LogIn));
         }
 
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            IdentityResult result = await _userManager.ConfirmEmailAsync(user, token);
+            if (result.Succeeded)
+            {
+                ViewBag.status = "Email Confirmed";
+            }
+            else
+            {
+                ViewBag.status = "Email not Confirmed";
+            }
+            return View();
+        }
+
         [HttpPost]
-        public async Task<IActionResult> ResetPasswordConfirm([Bind("Password")]ResetPasswordViewModel resetPasswordViewModel)
+        public async Task<IActionResult> ResetPasswordConfirm([Bind("Password")] ResetPasswordViewModel resetPasswordViewModel)
         {
             string userId = TempData["userId"].ToString();
             string token = TempData["token"].ToString();
