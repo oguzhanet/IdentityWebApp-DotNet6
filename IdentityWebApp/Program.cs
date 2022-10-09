@@ -38,6 +38,21 @@ builder.Services.AddAuthorization(ops =>
     });
 });
 
+builder.Services.AddAuthentication().AddFacebook(options =>
+{
+    // secrets.json
+    options.AppId = builder.Configuration["Authentication:Facebook:AppId"];
+    options.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
+}).AddGoogle(options =>
+{
+    options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+}).AddMicrosoftAccount(options =>
+{
+    options.ClientId = builder.Configuration["Authentication:Microsoft:ClientId"];
+    options.ClientSecret = builder.Configuration["Authentication:Microsoft:ClientSecret"];
+});
+
 builder.Services.AddIdentity<AppUser, AppRole>(ops =>
 {
     ops.User.RequireUniqueEmail = true;
